@@ -41,6 +41,9 @@ data/raw/
 *.m4a
 *.flac
 
+# Research PDFs (large binary files - stored locally only)
+*.pdf
+
 # IDE & OS
 .vscode/
 .idea/
