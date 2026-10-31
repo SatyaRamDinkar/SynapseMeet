@@ -105,6 +105,11 @@ python -m src.main
 SynapseMeet/
 ├── data/
 │   └── sample_transcripts/    # Multi-speaker sample meetings with conflicting decisions
+├── research_papers/           # Foundational literature & benchmark datasets
+│   ├── MemConflict (2026)     # Evaluating Long-Term Memory Systems Under Memory Conflicts
+│   ├── MeMo (2024)            # Multimodal Dataset for Memory Modelling in Multiparty Conversations
+│   ├── Meetalk                # Retrieval-Augmented & Adaptively Personalized Meeting Summarization
+│   └── Action Item Detection  # Context Modeling for Multiparty Dialogue
 ├── src/
 │   ├── ingestion/             # Audio processing & speaker diarization
 │   ├── schemas/               # Pydantic data models for decisions, tasks & alerts
@@ -118,6 +123,16 @@ SynapseMeet/
 ├── requirements.txt           # Python dependencies
 └── README.md                  # Project overview and documentation
 ```
+
+---
+
+## 📚 Foundational Research & Academic Citations
+SynapseMeet's architecture is grounded in cutting-edge conversational AI and memory conflict research:
+- **Memory Conflict Evaluation**: Tao et al. (2026) - *MemConflict: Evaluating Long-Term Memory Systems Under Memory Conflicts*.
+- **Multimodal Multiparty Memory**: Tsfasman et al. (2024) - *MeMo: A Multimodal Dataset for Memory Modelling in Multiparty Conversations*.
+- **Personalized Meeting RAG**: Chen et al. - *Meetalk: Retrieval-Augmented and Adaptively Personalized Meeting Summarization with Knowledge Learning from User Context*.
+- **Action Item Extraction**: Liu et al. (2023) - *Meeting Action Item Detection with Regularized Context Modeling*.
+- **Meeting Insight Extraction**: Bhuvaji et al. (2025) - *A Retrieval-Augmented Framework For Meeting Insight Extraction*.
 
 ---
 
