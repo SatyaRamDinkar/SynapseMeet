@@ -333,16 +333,16 @@ if menu == "Live Ingestion & Conflict Triage":
                 # clear after displaying
                 del st.session_state.last_approved_msg
         else:
-            if "last_approved_msg" in st.session_state and st.session_state.last_approved_msg:
-                st.success(st.session_state.last_approved_msg)
-                del st.session_state.last_approved_msg
-        else:
             st.markdown("""
             <div class="verified-card">
-                <h4 style="color: #4ADE80; margin: 0 0 8px 0;">✅ Verified: Zero Cross-Meeting Conflicts</h4>
+                <h4 style="color: #4ADE80; margin: 0 0 8px 0;">&#x2705; Verified: Zero Cross-Meeting Conflicts</h4>
                 <p style="margin: 4px 0; color: #F1F5F9;">This proposal aligns with all historical commitments and active organizational policies.</p>
             </div>
             """, unsafe_allow_html=True)
+
+            if "last_approved_msg" in st.session_state and st.session_state.last_approved_msg:
+                st.success(st.session_state.last_approved_msg)
+                del st.session_state.last_approved_msg
             
             if st.button("Confirm and Dispatch to Tracker (Linear / Jira)", type="primary", use_container_width=True):
                 st.session_state.graph.add_decision(new_decision)
