@@ -21,7 +21,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- Modern Enterprise Glassmorphic CSS Styling (Works in both Dark & Light Themes) ---
+# --- Modern Enterprise Glassmorphic CSS Styling (Optimized for Dark & Light Themes) ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -72,17 +72,17 @@ st.markdown("""
         letter-spacing: 0.05em;
     }
     .conflict-card {
-        background: rgba(220, 38, 38, 0.15);
+        background: rgba(220, 38, 38, 0.2);
         border-left: 6px solid #EF4444;
-        border: 1px solid rgba(239, 68, 68, 0.3);
+        border: 1px solid rgba(239, 68, 68, 0.4);
         border-radius: 8px;
         padding: 18px 22px;
         margin: 16px 0;
     }
     .verified-card {
-        background: rgba(22, 163, 74, 0.15);
+        background: rgba(22, 163, 74, 0.2);
         border-left: 6px solid #22C55E;
-        border: 1px solid rgba(34, 197, 94, 0.3);
+        border: 1px solid rgba(34, 197, 94, 0.4);
         border-radius: 8px;
         padding: 18px 22px;
         margin: 16px 0;
@@ -137,9 +137,6 @@ if "retriever" not in st.session_state:
 
 if "dispatched_tasks" not in st.session_state:
     st.session_state.dispatched_tasks = []
-
-if "audit_result" not in st.session_state:
-    st.session_state.audit_result = None
 
 # --- Sidebar ---
 with st.sidebar:
@@ -236,146 +233,120 @@ if menu == "Live Ingestion & Conflict Triage":
         task_desc = st.text_input("Derived Action Item", value="Write schema migration and backfill scripts from DynamoDB to PostgreSQL")
         assignee = st.text_input("Accountable Assignee", value="Alex")
 
-        audit_btn = st.button("Audit Decision Against Organizational Memory", type="primary", use_container_width=True)
-
-        if audit_btn:
-            new_decision = DecisionItem(
-                decision_id=f"DEC_{int(datetime.now().timestamp())}",
-                topic=topic,
-                statement=statement,
-                owner=owner,
-                meeting_id=meeting_id,
-                timestamp=datetime.now()
-            )
-
-            active_decisions = st.session_state.graph.get_active_decisions()
-            detector = AdvancedNLIConflictDetector()
-
-            conflict_found = None
-            for hist in active_decisions:
-                hist_item = DecisionItem(
-                    decision_id=hist["decision_id"],
-                    topic=hist["topic"],
-                    statement=hist["statement"],
-                    owner=hist["owner"],
-                    meeting_id=hist["meeting_id"],
-                    timestamp=datetime.fromisoformat(hist["timestamp"])
-                )
-                conflict_found = detector.evaluate_pair(hist_item, new_decision)
-                if conflict_found:
-                    break
-
-            # Persist evaluation result in session state so it survives any interaction
-            st.session_state.audit_result = {
-                "new_decision": new_decision,
-                "conflict_found": conflict_found,
-                "meeting_id": meeting_id,
-                "statement": statement,
-                "task_desc": task_desc,
-                "assignee": assignee
-            }
-
     with c_right:
         st.subheader("Cross-Meeting Intelligence & NLI Audit")
         
-        if st.session_state.audit_result is not None:
-            res_data = st.session_state.audit_result
-            new_dec = res_data["new_decision"]
-            conflict_found = res_data["conflict_found"]
-            m_id = res_data["meeting_id"]
-            stmt = res_data["statement"]
-            t_desc = res_data["task_desc"]
-            assgn = res_data["assignee"]
+        # Real-time reactive evaluation: runs instantly without requiring extra button presses
+        new_decision = DecisionItem(
+            decision_id=f"DEC_{int(datetime.now().timestamp())}",
+            topic=topic,
+            statement=statement,
+            owner=owner,
+            meeting_id=meeting_id,
+            timestamp=datetime.now()
+        )
 
+        active_decisions = st.session_state.graph.get_active_decisions()
+        detector = AdvancedNLIConflictDetector()
+
+        conflict_found = None
+        for hist in active_decisions:
+            hist_item = DecisionItem(
+                decision_id=hist["decision_id"],
+                topic=hist["topic"],
+                statement=hist["statement"],
+                owner=hist["owner"],
+                meeting_id=hist["meeting_id"],
+                timestamp=datetime.fromisoformat(hist["timestamp"])
+            )
+            conflict_found = detector.evaluate_pair(hist_item, new_decision)
             if conflict_found:
-                st.markdown(f"""
-                <div class="conflict-card">
-                    <h4 style="color: #F87171; margin: 0 0 8px 0;">🚨 Cross-Meeting Contradiction Identified!</h4>
-                    <p style="margin: 4px 0; color: #F1F5F9;"><b>Proposed Decision ({m_id}):</b> "{stmt}"</p>
-                    <p style="margin: 4px 0; color: #F1F5F9;"><b>Contradicts Policy ({conflict_found.historical_meeting_id}):</b> "{conflict_found.conflicting_decision.statement}"</p>
-                    <p style="margin: 6px 0; font-size: 0.9rem; color: #CBD5E1;"><b>Diagnostic Root Cause:</b> {conflict_found.explanation}</p>
-                </div>
-                """, unsafe_allow_html=True)
+                break
 
-                prob_df = pd.DataFrame({
-                    "Class": ["Entailment (Agreement)", "Neutral", "Contradiction"],
-                    "Probability (%)": [
-                        conflict_found.entailment_score * 100,
-                        conflict_found.neutral_score * 100,
-                        conflict_found.contradiction_score * 100
-                    ]
-                })
-                fig = px.bar(
-                    prob_df, 
-                    x="Probability (%)", 
-                    y="Class", 
-                    orientation="h",
-                    color="Class",
-                    color_discrete_map={
-                        "Entailment (Agreement)": "#22C55E",
-                        "Neutral": "#94A3B8",
-                        "Contradiction": "#EF4444"
-                    },
-                    text="Probability (%)"
-                )
-                fig.update_layout(height=200, margin=dict(l=0, r=0, t=20, b=0), showlegend=False)
-                fig.update_traces(texttemplate='%{text:.1f}%', textposition='outside')
-                st.plotly_chart(fig, use_container_width=True)
+        if conflict_found:
+            st.markdown(f"""
+            <div class="conflict-card">
+                <h4 style="color: #F87171; margin: 0 0 8px 0;">🚨 Cross-Meeting Contradiction Identified!</h4>
+                <p style="margin: 4px 0; color: #F1F5F9;"><b>Proposed Decision ({meeting_id}):</b> "{statement}"</p>
+                <p style="margin: 4px 0; color: #F1F5F9;"><b>Contradicts Policy ({conflict_found.historical_meeting_id}):</b> "{conflict_found.conflicting_decision.statement}"</p>
+                <p style="margin: 6px 0; font-size: 0.9rem; color: #CBD5E1;"><b>Diagnostic Root Cause:</b> {conflict_found.explanation}</p>
+            </div>
+            """, unsafe_allow_html=True)
 
-                st.warning("🛡️ Human Confirmation Gate: Automatic tracker posting halted to prevent committing conflicting objectives.")
-                
-                b1, b2 = st.columns(2)
-                with b1:
-                    if st.button("Approve & Supersede Historical Policy", type="primary", use_container_width=True):
-                        st.session_state.graph.add_decision(new_dec)
-                        st.session_state.graph.supersede_decision(
-                            old_decision_id=conflict_found.conflicting_decision.decision_id,
-                            new_decision_id=new_dec.decision_id,
-                            timestamp=datetime.now()
-                        )
-                        task_tracker = TaskTrackerService()
-                        act = ActionItem(
-                            task_id=f"TASK_{int(datetime.now().timestamp())}",
-                            description=t_desc,
-                            assignee=assgn,
-                            deadline=datetime.now() + timedelta(days=7),
-                            meeting_id=m_id
-                        )
-                        res = task_tracker.dispatch_action_item(act, confirmed_by_user=True)
-                        st.session_state.dispatched_tasks.append(res)
-                        st.session_state.audit_result = None
-                        st.success(f"State Updated: Predecessor decision marked SUPERSEDED. Task {res['external_issue_id']} dispatched!")
-                        st.rerun()
-                with b2:
-                    if st.button("Reject Proposal & Maintain Policy", use_container_width=True):
-                        st.session_state.audit_result = None
-                        st.info("Proposal rejected. Historical policy maintained intact.")
-                        st.rerun()
-            else:
-                st.markdown("""
-                <div class="verified-card">
-                    <h4 style="color: #4ADE80; margin: 0 0 8px 0;">✅ Verified: Zero Cross-Meeting Conflicts</h4>
-                    <p style="margin: 4px 0; color: #F1F5F9;">This proposal aligns with all historical commitments and active organizational policies.</p>
-                </div>
-                """, unsafe_allow_html=True)
-                
-                if st.button("Confirm and Dispatch to Tracker (Linear / Jira)", type="primary", use_container_width=True):
-                    st.session_state.graph.add_decision(new_dec)
+            prob_df = pd.DataFrame({
+                "Class": ["Entailment (Agreement)", "Neutral", "Contradiction"],
+                "Probability (%)": [
+                    conflict_found.entailment_score * 100,
+                    conflict_found.neutral_score * 100,
+                    conflict_found.contradiction_score * 100
+                ]
+            })
+            fig = px.bar(
+                prob_df, 
+                x="Probability (%)", 
+                y="Class", 
+                orientation="h",
+                color="Class",
+                color_discrete_map={
+                    "Entailment (Agreement)": "#22C55E",
+                    "Neutral": "#94A3B8",
+                    "Contradiction": "#EF4444"
+                },
+                text="Probability (%)"
+            )
+            fig.update_layout(height=200, margin=dict(l=0, r=0, t=20, b=0), showlegend=False)
+            fig.update_traces(texttemplate='%{text:.1f}%', textposition='outside')
+            st.plotly_chart(fig, use_container_width=True)
+
+            st.warning("🛡️ Human Confirmation Gate: Automatic tracker posting halted to prevent committing conflicting objectives.")
+            
+            b1, b2 = st.columns(2)
+            with b1:
+                if st.button("Approve & Supersede Historical Policy", type="primary", use_container_width=True):
+                    st.session_state.graph.add_decision(new_decision)
+                    st.session_state.graph.supersede_decision(
+                        old_decision_id=conflict_found.conflicting_decision.decision_id,
+                        new_decision_id=new_decision.decision_id,
+                        timestamp=datetime.now()
+                    )
                     task_tracker = TaskTrackerService()
                     act = ActionItem(
                         task_id=f"TASK_{int(datetime.now().timestamp())}",
-                        description=t_desc,
-                        assignee=assgn,
+                        description=task_desc,
+                        assignee=assignee,
                         deadline=datetime.now() + timedelta(days=7),
-                        meeting_id=m_id
+                        meeting_id=meeting_id
                     )
                     res = task_tracker.dispatch_action_item(act, confirmed_by_user=True)
                     st.session_state.dispatched_tasks.append(res)
-                    st.session_state.audit_result = None
-                    st.success(f"Task {res['external_issue_id']} dispatched successfully!")
+                    st.success(f"State Updated: Predecessor decision marked SUPERSEDED. Task {res['external_issue_id']} dispatched!")
+                    st.rerun()
+            with b2:
+                if st.button("Reject Proposal & Maintain Policy", use_container_width=True):
+                    st.info("Proposal rejected. Historical policy maintained intact.")
                     st.rerun()
         else:
-            st.info("Select a scenario or enter a decision statement and click 'Audit Decision Against Organizational Memory'.")
+            st.markdown("""
+            <div class="verified-card">
+                <h4 style="color: #4ADE80; margin: 0 0 8px 0;">✅ Verified: Zero Cross-Meeting Conflicts</h4>
+                <p style="margin: 4px 0; color: #F1F5F9;">This proposal aligns with all historical commitments and active organizational policies.</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            if st.button("Confirm and Dispatch to Tracker (Linear / Jira)", type="primary", use_container_width=True):
+                st.session_state.graph.add_decision(new_decision)
+                task_tracker = TaskTrackerService()
+                act = ActionItem(
+                    task_id=f"TASK_{int(datetime.now().timestamp())}",
+                    description=task_desc,
+                    assignee=assignee,
+                    deadline=datetime.now() + timedelta(days=7),
+                    meeting_id=meeting_id
+                )
+                res = task_tracker.dispatch_action_item(act, confirmed_by_user=True)
+                st.session_state.dispatched_tasks.append(res)
+                st.success(f"Task {res['external_issue_id']} dispatched successfully!")
+                st.rerun()
 
 # =========================================================================
 # TAB 2: TEMPORAL KNOWLEDGE GRAPH EXPLORER
