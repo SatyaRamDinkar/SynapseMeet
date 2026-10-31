@@ -13,6 +13,23 @@ SynapseMeet is an autonomous meeting intelligence and execution agent designed f
 
 ---
 
+## 🤖 AI Models, LLMs & Development Tooling Stack
+
+SynapseMeet leverages an ensemble of specialized machine learning models and agentic developer tooling across each stage of its pipeline:
+
+| Pipeline Stage | AI Model / Architecture | Framework & Provider | Functional Purpose |
+| :--- | :--- | :--- | :--- |
+| **Agentic IDE & Workflow** | **Google Antigravity (AGY)** | Google DeepMind Agentic Coding | Autonomous project scaffolding, continuous git-sync, test execution, and deployment orchestration |
+| **Primary Reasoning & Extraction** | **Gemini 1.5 Pro / Flash** | Google Vertex AI / Gemini API | Zero-shot structured JSON extraction of decision entities, action owners, and strict Pydantic schemas |
+| **Audio Diarization & ASR** | **Whisper-large-v3 + PyAnnote 3.1** | OpenAI / Hugging Face PyAnnote | Millisecond-accurate multi-speaker segmentation, voiceprint attribution, and timestamp alignment |
+| **NLI Contradiction Engine** | **DeBERTa-v3-large (Cross-Encoder)** | Microsoft / Hugging Face (`cross-encoder/nli-deberta-v3-base`) | 3-Class Softmax inference ($P(\text{Entailment}), P(\text{Neutral}), P(\text{Contradiction})$) for policy clash detection |
+| **Dense Semantic Embeddings** | **BGE-Large-EN-v1.5** | BAAI / Sentence-Transformers | High-dimensional dense representation vectors for semantic meeting context retrieval |
+| **Sparse Lexical Search** | **BM25 Okapi Algorithm** | Scikit-Learn / Rank-BM25 | Exact token matching for ticket IDs, software versions, database names, and technology tags |
+| **Meeting Summary Clustering** | **Agglomerative Cosine Clustering** | Scikit-Learn | Hierarchical clustering grouping historical meetings into technical domains (ACM SAC 2025) |
+| **Graph Memory Engine** | **Temporal Directed Graph (DiGraph)** | NetworkX & Neo4j Cypher Graph RAG | Valid-time interval tracking `[valid_from, valid_to]` and decision lifecycle state transitions |
+
+---
+
 ## Academic Foundation and Base Paper
 
 This project builds upon and directly extends the foundational research paper:
