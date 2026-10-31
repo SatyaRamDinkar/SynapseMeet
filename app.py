@@ -21,7 +21,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- Modern Enterprise Glassmorphic CSS Styling ---
+# --- Modern Enterprise Glassmorphic CSS Styling (Works in both Dark & Light Themes) ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -53,44 +53,39 @@ st.markdown("""
         line-height: 1.5;
     }
     .stat-card {
-        background: #FFFFFF;
-        border: 1px solid #E2E8F0;
+        background: rgba(30, 41, 59, 0.7);
+        border: 1px solid #334155;
         border-radius: 10px;
         padding: 16px 20px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .stat-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.15);
     }
     .stat-value {
         font-size: 1.8rem;
         font-weight: 700;
-        color: #0F172A;
+        color: #F8FAFC;
     }
     .stat-label {
         font-size: 0.82rem;
         font-weight: 500;
-        color: #64748B;
+        color: #94A3B8;
         text-transform: uppercase;
         letter-spacing: 0.05em;
     }
     .conflict-card {
-        background: #FEF2F2;
-        border-left: 6px solid #DC2626;
+        background: rgba(220, 38, 38, 0.15);
+        border-left: 6px solid #EF4444;
+        border: 1px solid rgba(239, 68, 68, 0.3);
         border-radius: 8px;
         padding: 18px 22px;
         margin: 16px 0;
-        box-shadow: 0 2px 4px rgba(220, 38, 38, 0.08);
     }
     .verified-card {
-        background: #F0FDF4;
-        border-left: 6px solid #16A34A;
+        background: rgba(22, 163, 74, 0.15);
+        border-left: 6px solid #22C55E;
+        border: 1px solid rgba(34, 197, 94, 0.3);
         border-radius: 8px;
         padding: 18px 22px;
         margin: 16px 0;
-        box-shadow: 0 2px 4px rgba(22, 163, 74, 0.08);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -143,10 +138,13 @@ if "retriever" not in st.session_state:
 if "dispatched_tasks" not in st.session_state:
     st.session_state.dispatched_tasks = []
 
+if "audit_result" not in st.session_state:
+    st.session_state.audit_result = None
+
 # --- Sidebar ---
 with st.sidebar:
     st.markdown("### ⚡ SynapseMeet Studio")
-    st.caption("v2.4 Production AI/ML Dashboard")
+    st.caption("v2.5 Production AI/ML Dashboard")
     st.divider()
 
     menu = st.radio("Navigation Pane", [
@@ -195,14 +193,14 @@ if menu == "Live Ingestion & Conflict Triage":
         st.markdown("""
         <div class="stat-card">
             <div class="stat-label">Precision Metric</div>
-            <div class="stat-value" style="color: #0284C7;">93.75%</div>
+            <div class="stat-value" style="color: #38BDF8;">93.75%</div>
         </div>
         """, unsafe_allow_html=True)
     with m_col4:
         st.markdown("""
         <div class="stat-card">
             <div class="stat-label">Mean Latency</div>
-            <div class="stat-value" style="color: #10B981;">0.011 ms</div>
+            <div class="stat-value" style="color: #34D399;">0.011 ms</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -224,7 +222,6 @@ if menu == "Live Ingestion & Conflict Triage":
         owner = st.text_input("Decision Owner / Tech Lead", value="Alex (Tech Lead)")
 
         preset_options = {
-            "Custom Proposal": "",
             "Database Policy Reversal (DynamoDB -> PostgreSQL)": "Migrate user profiles from DynamoDB to PostgreSQL this sprint.",
             "Cloud Platform Shift (AWS -> GCP)": "Move container workloads from AWS to GCP Kubernetes engine.",
             "Architecture Flip (Microservices -> Monolith)": "Maintain billing service inside the monolith to avoid latency.",
@@ -233,7 +230,7 @@ if menu == "Live Ingestion & Conflict Triage":
         }
         selected_scenario = st.selectbox("Quick-Load Test Scenarios", list(preset_options.keys()))
         
-        default_stmt = preset_options[selected_scenario] if preset_options[selected_scenario] else "Migrate user profiles from DynamoDB to PostgreSQL this sprint."
+        default_stmt = preset_options[selected_scenario]
         statement = st.text_area("Spoken Decision Statement", value=default_stmt, height=90)
 
         task_desc = st.text_input("Derived Action Item", value="Write schema migration and backfill scripts from DynamoDB to PostgreSQL")
@@ -241,9 +238,6 @@ if menu == "Live Ingestion & Conflict Triage":
 
         audit_btn = st.button("Audit Decision Against Organizational Memory", type="primary", use_container_width=True)
 
-    with c_right:
-        st.subheader("Cross-Meeting Intelligence & NLI Audit")
-        
         if audit_btn:
             new_decision = DecisionItem(
                 decision_id=f"DEC_{int(datetime.now().timestamp())}",
@@ -271,13 +265,35 @@ if menu == "Live Ingestion & Conflict Triage":
                 if conflict_found:
                     break
 
+            # Persist evaluation result in session state so it survives any interaction
+            st.session_state.audit_result = {
+                "new_decision": new_decision,
+                "conflict_found": conflict_found,
+                "meeting_id": meeting_id,
+                "statement": statement,
+                "task_desc": task_desc,
+                "assignee": assignee
+            }
+
+    with c_right:
+        st.subheader("Cross-Meeting Intelligence & NLI Audit")
+        
+        if st.session_state.audit_result is not None:
+            res_data = st.session_state.audit_result
+            new_dec = res_data["new_decision"]
+            conflict_found = res_data["conflict_found"]
+            m_id = res_data["meeting_id"]
+            stmt = res_data["statement"]
+            t_desc = res_data["task_desc"]
+            assgn = res_data["assignee"]
+
             if conflict_found:
                 st.markdown(f"""
                 <div class="conflict-card">
-                    <h4 style="color: #991B1B; margin: 0 0 8px 0;">🚨 Cross-Meeting Contradiction Identified!</h4>
-                    <p style="margin: 4px 0; color: #1E293B;"><b>Proposed Decision ({meeting_id}):</b> "{statement}"</p>
-                    <p style="margin: 4px 0; color: #1E293B;"><b>Contradicts Policy ({conflict_found.historical_meeting_id}):</b> "{conflict_found.conflicting_decision.statement}"</p>
-                    <p style="margin: 6px 0; font-size: 0.9rem; color: #475569;"><b>Diagnostic Root Cause:</b> {conflict_found.explanation}</p>
+                    <h4 style="color: #F87171; margin: 0 0 8px 0;">🚨 Cross-Meeting Contradiction Identified!</h4>
+                    <p style="margin: 4px 0; color: #F1F5F9;"><b>Proposed Decision ({m_id}):</b> "{stmt}"</p>
+                    <p style="margin: 4px 0; color: #F1F5F9;"><b>Contradicts Policy ({conflict_found.historical_meeting_id}):</b> "{conflict_found.conflicting_decision.statement}"</p>
+                    <p style="margin: 6px 0; font-size: 0.9rem; color: #CBD5E1;"><b>Diagnostic Root Cause:</b> {conflict_found.explanation}</p>
                 </div>
                 """, unsafe_allow_html=True)
 
@@ -311,51 +327,55 @@ if menu == "Live Ingestion & Conflict Triage":
                 b1, b2 = st.columns(2)
                 with b1:
                     if st.button("Approve & Supersede Historical Policy", type="primary", use_container_width=True):
-                        st.session_state.graph.add_decision(new_decision)
+                        st.session_state.graph.add_decision(new_dec)
                         st.session_state.graph.supersede_decision(
                             old_decision_id=conflict_found.conflicting_decision.decision_id,
-                            new_decision_id=new_decision.decision_id,
+                            new_decision_id=new_dec.decision_id,
                             timestamp=datetime.now()
                         )
                         task_tracker = TaskTrackerService()
                         act = ActionItem(
                             task_id=f"TASK_{int(datetime.now().timestamp())}",
-                            description=task_desc,
-                            assignee=assignee,
+                            description=t_desc,
+                            assignee=assgn,
                             deadline=datetime.now() + timedelta(days=7),
-                            meeting_id=meeting_id
+                            meeting_id=m_id
                         )
                         res = task_tracker.dispatch_action_item(act, confirmed_by_user=True)
                         st.session_state.dispatched_tasks.append(res)
+                        st.session_state.audit_result = None
                         st.success(f"State Updated: Predecessor decision marked SUPERSEDED. Task {res['external_issue_id']} dispatched!")
                         st.rerun()
                 with b2:
                     if st.button("Reject Proposal & Maintain Policy", use_container_width=True):
+                        st.session_state.audit_result = None
                         st.info("Proposal rejected. Historical policy maintained intact.")
+                        st.rerun()
             else:
                 st.markdown("""
                 <div class="verified-card">
-                    <h4 style="color: #166534; margin: 0 0 8px 0;">✅ Verified: Zero Cross-Meeting Conflicts</h4>
-                    <p style="margin: 4px 0; color: #1E293B;">This proposal aligns with all historical commitments and active organizational policies.</p>
+                    <h4 style="color: #4ADE80; margin: 0 0 8px 0;">✅ Verified: Zero Cross-Meeting Conflicts</h4>
+                    <p style="margin: 4px 0; color: #F1F5F9;">This proposal aligns with all historical commitments and active organizational policies.</p>
                 </div>
                 """, unsafe_allow_html=True)
                 
                 if st.button("Confirm and Dispatch to Tracker (Linear / Jira)", type="primary", use_container_width=True):
-                    st.session_state.graph.add_decision(new_decision)
+                    st.session_state.graph.add_decision(new_dec)
                     task_tracker = TaskTrackerService()
                     act = ActionItem(
                         task_id=f"TASK_{int(datetime.now().timestamp())}",
-                        description=task_desc,
-                        assignee=assignee,
+                        description=t_desc,
+                        assignee=assgn,
                         deadline=datetime.now() + timedelta(days=7),
-                        meeting_id=meeting_id
+                        meeting_id=m_id
                     )
                     res = task_tracker.dispatch_action_item(act, confirmed_by_user=True)
                     st.session_state.dispatched_tasks.append(res)
+                    st.session_state.audit_result = None
                     st.success(f"Task {res['external_issue_id']} dispatched successfully!")
                     st.rerun()
         else:
-            st.info("Enter a decision statement and click 'Audit Decision' to evaluate cross-meeting consistency.")
+            st.info("Select a scenario or enter a decision statement and click 'Audit Decision Against Organizational Memory'.")
 
 # =========================================================================
 # TAB 2: TEMPORAL KNOWLEDGE GRAPH EXPLORER
@@ -494,40 +514,38 @@ elif menu == "Quantitative Metrics & Benchmarks":
     harness = ComprehensiveEvaluationHarness()
     res = harness.run_benchmark()
 
-    # Metric KPI Cards
     b1, b2, b3, b4 = st.columns(4)
     with b1:
         st.markdown(f"""
         <div class="stat-card">
             <div class="stat-label">Precision Metric</div>
-            <div class="stat-value" style="color: #0284C7;">{res['precision']*100:.2f}%</div>
+            <div class="stat-value" style="color: #38BDF8;">{res['precision']*100:.2f}%</div>
         </div>
         """, unsafe_allow_html=True)
     with b2:
         st.markdown(f"""
         <div class="stat-card">
             <div class="stat-label">Recall (Sensitivity)</div>
-            <div class="stat-value" style="color: #10B981;">{res['recall']*100:.2f}%</div>
+            <div class="stat-value" style="color: #34D399;">{res['recall']*100:.2f}%</div>
         </div>
         """, unsafe_allow_html=True)
     with b3:
         st.markdown(f"""
         <div class="stat-card">
             <div class="stat-label">Specificity Metric</div>
-            <div class="stat-value" style="color: #8B5CF6;">{res['specificity']*100:.2f}%</div>
+            <div class="stat-value" style="color: #A78BFA;">{res['specificity']*100:.2f}%</div>
         </div>
         """, unsafe_allow_html=True)
     with b4:
         st.markdown(f"""
         <div class="stat-card">
             <div class="stat-label">Mean Inference Latency</div>
-            <div class="stat-value" style="color: #F59E0B;">{res['mean_latency_ms']} ms</div>
+            <div class="stat-value" style="color: #FBBF24;">{res['mean_latency_ms']} ms</div>
         </div>
         """, unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # Comparative Matrix Table: SynapseMeet vs Base Paper
     st.subheader("📊 Comparative Matrix Table (SynapseMeet vs Base Paper)")
     comp_matrix = pd.DataFrame([
         {
@@ -596,7 +614,7 @@ elif menu == "Quantitative Metrics & Benchmarks":
             "Score (%)": [78.2, res['precision']*100, 74.1, res['recall']*100, 81.0, res['specificity']*100, 76.5, res['accuracy']*100]
         })
         fig_b = px.bar(bar_df, x="Metric", y="Score (%)", color="System", barmode="group",
-                       color_discrete_map={"Base Paper (SAC '25)": "#94A3B8", "SynapseMeet": "#0284C7"},
+                       color_discrete_map={"Base Paper (SAC '25)": "#94A3B8", "SynapseMeet": "#38BDF8"},
                        title="Statistical Performance Comparison: SynapseMeet vs Base Paper")
         fig_b.update_layout(height=340)
         st.plotly_chart(fig_b, use_container_width=True)
