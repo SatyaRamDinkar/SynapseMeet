@@ -302,7 +302,8 @@ if menu == "Live Ingestion & Conflict Triage":
             
             b1, b2 = st.columns(2)
             with b1:
-                if st.button("Approve & Supersede Historical Policy", type="primary", use_container_width=True):
+                approve_clicked = st.button("Approve & Supersede Historical Policy", type="primary", use_container_width=True, key="btn_approve_override")
+                if approve_clicked:
                     st.session_state.graph.add_decision(new_decision)
                     st.session_state.graph.supersede_decision(
                         old_decision_id=conflict_found.conflicting_decision.decision_id,
@@ -319,12 +320,22 @@ if menu == "Live Ingestion & Conflict Triage":
                     )
                     res = task_tracker.dispatch_action_item(act, confirmed_by_user=True)
                     st.session_state.dispatched_tasks.append(res)
-                    st.success(f"State Updated: Predecessor decision marked SUPERSEDED. Task {res['external_issue_id']} dispatched!")
+                    st.session_state.last_approved_msg = f"Policy Approved! Historical decision '{conflict_found.conflicting_decision.decision_id}' marked SUPERSEDED. Task {res['external_issue_id']} dispatched to Tracker."
                     st.rerun()
             with b2:
-                if st.button("Reject Proposal & Maintain Policy", use_container_width=True):
-                    st.info("Proposal rejected. Historical policy maintained intact.")
+                reject_clicked = st.button("Reject Proposal & Maintain Policy", use_container_width=True, key="btn_reject_override")
+                if reject_clicked:
+                    st.session_state.last_approved_msg = "Proposal rejected. Historical organizational policy maintained intact."
                     st.rerun()
+
+            if "last_approved_msg" in st.session_state and st.session_state.last_approved_msg:
+                st.success(st.session_state.last_approved_msg)
+                # clear after displaying
+                del st.session_state.last_approved_msg
+        else:
+            if "last_approved_msg" in st.session_state and st.session_state.last_approved_msg:
+                st.success(st.session_state.last_approved_msg)
+                del st.session_state.last_approved_msg
         else:
             st.markdown("""
             <div class="verified-card">
