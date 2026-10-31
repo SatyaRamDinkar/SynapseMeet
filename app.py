@@ -146,7 +146,7 @@ if "dispatched_tasks" not in st.session_state:
 # --- Sidebar ---
 with st.sidebar:
     st.markdown("### ⚡ SynapseMeet Studio")
-    st.caption("v2.3 Production AI/ML Dashboard")
+    st.caption("v2.4 Production AI/ML Dashboard")
     st.divider()
 
     menu = st.radio("Navigation Pane", [
@@ -195,14 +195,14 @@ if menu == "Live Ingestion & Conflict Triage":
         st.markdown("""
         <div class="stat-card">
             <div class="stat-label">Precision Metric</div>
-            <div class="stat-value" style="color: #0284C7;">1.000 (100%)</div>
+            <div class="stat-value" style="color: #0284C7;">93.75%</div>
         </div>
         """, unsafe_allow_html=True)
     with m_col4:
         st.markdown("""
         <div class="stat-card">
             <div class="stat-label">Mean Latency</div>
-            <div class="stat-value" style="color: #10B981;">0.010 ms</div>
+            <div class="stat-value" style="color: #10B981;">0.011 ms</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -487,34 +487,34 @@ elif menu == "Quantitative Metrics & Benchmarks":
     st.markdown("""
     <div class="hero-banner">
         <div class="hero-title">Quantitative Metrics & Benchmark Matrix</div>
-        <div class="hero-subtitle">Empirical comparison: SynapseMeet vs Base Paper (Bhuvaji et al., ACM SAC 2025) and SOTA Baselines.</div>
+        <div class="hero-subtitle">Empirical comparison: SynapseMeet vs Base Paper (Bhuvaji et al., ACM SAC 2025) across 30 multi-domain pairs.</div>
     </div>
     """, unsafe_allow_html=True)
 
     harness = ComprehensiveEvaluationHarness()
     res = harness.run_benchmark()
 
-    # Gauge Cards
+    # Metric KPI Cards
     b1, b2, b3, b4 = st.columns(4)
     with b1:
         st.markdown(f"""
         <div class="stat-card">
             <div class="stat-label">Precision Metric</div>
-            <div class="stat-value" style="color: #0284C7;">{res['precision']:.3f} (100%)</div>
+            <div class="stat-value" style="color: #0284C7;">{res['precision']*100:.2f}%</div>
         </div>
         """, unsafe_allow_html=True)
     with b2:
         st.markdown(f"""
         <div class="stat-card">
             <div class="stat-label">Recall (Sensitivity)</div>
-            <div class="stat-value" style="color: #10B981;">{res['recall']:.3f} (100%)</div>
+            <div class="stat-value" style="color: #10B981;">{res['recall']*100:.2f}%</div>
         </div>
         """, unsafe_allow_html=True)
     with b3:
         st.markdown(f"""
         <div class="stat-card">
             <div class="stat-label">Specificity Metric</div>
-            <div class="stat-value" style="color: #8B5CF6;">{res['specificity']:.3f} (100%)</div>
+            <div class="stat-value" style="color: #8B5CF6;">{res['specificity']*100:.2f}%</div>
         </div>
         """, unsafe_allow_html=True)
     with b4:
@@ -533,38 +533,38 @@ elif menu == "Quantitative Metrics & Benchmarks":
         {
             "Performance Metric / Capability": "Precision",
             "Base Paper (Bhuvaji et al., SAC '25)": "0.782 (78.2%)",
-            "SynapseMeet (Our Agentic System)": f"1.000 ({res['precision']*100:.1f}%)",
-            "Net Improvement / Gain": "+21.8% Gain"
+            "SynapseMeet (Our Agentic System)": f"{res['precision']*100:.2f}%",
+            "Net Improvement / Gain": "+15.55% Gain"
         },
         {
             "Performance Metric / Capability": "Recall (Sensitivity)",
             "Base Paper (Bhuvaji et al., SAC '25)": "0.741 (74.1%)",
-            "SynapseMeet (Our Agentic System)": f"1.000 ({res['recall']*100:.1f}%)",
-            "Net Improvement / Gain": "+25.9% Gain"
+            "SynapseMeet (Our Agentic System)": f"{res['recall']*100:.2f}%",
+            "Net Improvement / Gain": "+19.65% Gain"
         },
         {
             "Performance Metric / Capability": "Specificity",
             "Base Paper (Bhuvaji et al., SAC '25)": "0.810 (81.0%)",
-            "SynapseMeet (Our Agentic System)": f"1.000 ({res['specificity']*100:.1f}%)",
-            "Net Improvement / Gain": "+19.0% Gain"
+            "SynapseMeet (Our Agentic System)": f"{res['specificity']*100:.2f}%",
+            "Net Improvement / Gain": "+11.86% Gain"
         },
         {
             "Performance Metric / Capability": "Raw Overall Accuracy",
             "Base Paper (Bhuvaji et al., SAC '25)": "0.765 (76.5%)",
-            "SynapseMeet (Our Agentic System)": f"1.000 ({res['accuracy']*100:.1f}%)",
-            "Net Improvement / Gain": "+23.5% Gain"
+            "SynapseMeet (Our Agentic System)": f"{res['accuracy']*100:.2f}%",
+            "Net Improvement / Gain": "+16.83% Gain"
         },
         {
             "Performance Metric / Capability": "F1-Score",
             "Base Paper (Bhuvaji et al., SAC '25)": "0.761 (76.1%)",
-            "SynapseMeet (Our Agentic System)": f"1.000 ({res['f1_score']*100:.1f}%)",
-            "Net Improvement / Gain": "+23.9% Gain"
+            "SynapseMeet (Our Agentic System)": f"{res['f1_score']*100:.2f}%",
+            "Net Improvement / Gain": "+17.65% Gain"
         },
         {
             "Performance Metric / Capability": "Mean Inference Latency",
-            "Base Paper (Bhuvaji et al., SAC '25)": "1420.0 ms (Batch LLM)",
+            "Base Paper (Bhuvaji et al., SAC '25)": "1,420.0 ms (Batch LLM)",
             "SynapseMeet (Our Agentic System)": f"{res['mean_latency_ms']} ms (Hybrid Graph RAG)",
-            "Net Improvement / Gain": "> 100,000x Speedup"
+            "Net Improvement / Gain": "> 100,000x Latency Reduction"
         },
         {
             "Performance Metric / Capability": "Cross-Meeting Conflict Detection",
@@ -590,20 +590,18 @@ elif menu == "Quantitative Metrics & Benchmarks":
     st.markdown("<br>", unsafe_allow_html=True)
     col_c1, col_c2 = st.columns(2)
     with col_c1:
-        # Comparison Bar Chart
         bar_df = pd.DataFrame({
-            "System": ["Base Paper (SAC '25)", "SynapseMeet", "Base Paper (SAC '25)", "SynapseMeet", "Base Paper (SAC '25)", "SynapseMeet"],
-            "Metric": ["Precision", "Precision", "Recall", "Recall", "Accuracy", "Accuracy"],
-            "Score (%)": [78.2, res['precision']*100, 74.1, res['recall']*100, 76.5, res['accuracy']*100]
+            "System": ["Base Paper (SAC '25)", "SynapseMeet", "Base Paper (SAC '25)", "SynapseMeet", "Base Paper (SAC '25)", "SynapseMeet", "Base Paper (SAC '25)", "SynapseMeet"],
+            "Metric": ["Precision", "Precision", "Recall", "Recall", "Specificity", "Specificity", "Accuracy", "Accuracy"],
+            "Score (%)": [78.2, res['precision']*100, 74.1, res['recall']*100, 81.0, res['specificity']*100, 76.5, res['accuracy']*100]
         })
         fig_b = px.bar(bar_df, x="Metric", y="Score (%)", color="System", barmode="group",
                        color_discrete_map={"Base Paper (SAC '25)": "#94A3B8", "SynapseMeet": "#0284C7"},
-                       title="Performance Comparison: SynapseMeet vs Base Paper")
+                       title="Statistical Performance Comparison: SynapseMeet vs Base Paper")
         fig_b.update_layout(height=340)
         st.plotly_chart(fig_b, use_container_width=True)
 
     with col_c2:
-        # Confusion Matrix
         z_values = [
             [res["true_negatives"], res["false_positives"]],
             [res["false_negatives"], res["true_positives"]]
@@ -614,7 +612,7 @@ elif menu == "Quantitative Metrics & Benchmarks":
             y=["Actual Agreement", "Actual Contradiction"],
             color_continuous_scale="Blues",
             text_auto=True,
-            title="Confusion Matrix (30 Test Pairs)"
+            title="Confusion Matrix (30 Multi-Domain Evaluation Pairs)"
         )
         fig_cm.update_layout(height=340)
         st.plotly_chart(fig_cm, use_container_width=True)

@@ -27,19 +27,19 @@ This project builds upon and directly extends the foundational research paper:
 
 ## 📊 Comparative Performance Matrix Table: SynapseMeet vs Base Paper
 
-The following matrix contrasts the empirical performance and capabilities of **SynapseMeet** against the ACM SAC 2025 base paper (*Bhuvaji et al.*):
+The following matrix contrasts the empirical performance and capabilities of **SynapseMeet** against the ACM SAC 2025 base paper (*Bhuvaji et al.*) evaluated across 30 multi-domain engineering policy pairs:
 
 | Performance Metric / Capability | Base Paper (Bhuvaji et al., SAC '25) | SynapseMeet (Our Agentic System) | Net Improvement / Gain |
 | :--- | :---: | :---: | :--- |
-| **Precision** | 0.782 (78.2%) | **1.000 (100.0%)** | **+21.8% Improvement** |
-| **Recall (Sensitivity)** | 0.741 (74.1%) | **1.000 (100.0%)** | **+25.9% Improvement** |
-| **Specificity** | 0.810 (81.0%) | **1.000 (100.0%)** | **+19.0% Improvement** |
-| **Raw Overall Accuracy** | 0.765 (76.5%) | **1.000 (100.0%)** | **+23.5% Improvement** |
-| **F1-Score** | 0.761 (76.1%) | **1.000 (100.0%)** | **+23.9% Improvement** |
-| **Mean Inference Latency** | 1,420.0 ms (Batch LLM RAG) | **0.010 ms (Hybrid Graph RAG)** | **> 100,000x Latency Reduction** |
-| **Cross-Meeting Conflict Detection** | Not Supported (Passive Q&A) | **Automated NLI Contradiction Engine** | **New Novel AI Capability** |
-| **Decision Lifecycle State Transitions** | Static Text Corpus | **Directed Graph Validity Intervals** | **Dynamic Policy Tracking** |
-| **Guarded Issue Tracker Dispatch** | Manual reading only | **Linear / Jira / GitHub Webhooks** | **Closed-Loop Execution** |
+| **Precision** | 0.782 (78.20%) | **0.938 (93.75%)** | **+15.55% Gain** |
+| **Recall (Sensitivity)** | 0.741 (74.10%) | **0.938 (93.75%)** | **+19.65% Gain** |
+| **Specificity** | 0.810 (81.00%) | **0.929 (92.86%)** | **+11.86% Gain** |
+| **Raw Overall Accuracy** | 0.765 (76.50%) | **0.933 (93.33%)** | **+16.83% Gain** |
+| **F1-Score** | 0.761 (76.10%) | **0.938 (93.75%)** | **+17.65% Gain** |
+| **Mean Inference Latency** | 1,420.0 ms (Batch LLM RAG) | **0.011 ms (Hybrid Graph RAG)** | **> 100,000x Latency Reduction** |
+| **Cross-Meeting Conflict Detection** | ❌ Not Supported (Passive Q&A) | **✅ Automated NLI Contradiction Engine** | **New Novel AI Capability** |
+| **Decision Lifecycle State Transitions** | ❌ Static Text Corpus | **✅ Directed Graph Validity Intervals** | **Dynamic Policy Tracking** |
+| **Guarded Issue Tracker Dispatch** | ❌ Manual reading only | **✅ Linear / Jira / GitHub Webhooks** | **Closed-Loop Execution** |
 
 ---
 
