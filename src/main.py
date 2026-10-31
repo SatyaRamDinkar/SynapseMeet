@@ -14,16 +14,16 @@ from src.schemas.models import DecisionItem, ActionItem, MeetingTranscript, Spea
 from src.clustering.meeting_clusterer import MeetingSummaryClusterer
 from src.retrieval.hybrid_retriever import HybridRetriever
 from src.memory.temporal_graph import TemporalKnowledgeGraph
-from src.reasoning.nli_conflict_detector import NLIConflictDetector
+from src.reasoning.advanced_nli_detector import AdvancedNLIConflictDetector
 from src.execution.tracker_service import TaskTrackerService
-from src.evaluation.contradiction_benchmark import ContradictionBenchmark
+from src.evaluation.comprehensive_benchmark import ComprehensiveEvaluationHarness
 
 console = Console()
 
 def run_pipeline():
     console.print(Panel.fit(
         "[bold cyan]SynapseMeet: Autonomous Meeting-to-Execution Intelligence Engine[/bold cyan]\n"
-        "[dim]Extended from ACM SAC 2025 Base Paper (Bhuvaji et al.) with Temporal Knowledge Graphs & NLI[/dim]"
+        "[dim]Extended from ACM SAC 2025 Base Paper (Bhuvaji et al.) with Temporal Knowledge Graphs & Calibrated NLI[/dim]"
     ))
 
     # =========================================================================
@@ -129,10 +129,10 @@ def run_pipeline():
     console.print(f"[dim]Hybrid RAG (BM25 + Dense RRF) retrieved {len(search_results)} relevant historical decisions.[/dim]")
 
     # =========================================================================
-    # STAGE 4: NLI CONTRADICTION & CROSS-MEETING CONFLICT DETECTION
+    # STAGE 4: ADVANCED NLI CONTRADICTION & CROSS-MEETING CONFLICT DETECTION
     # =========================================================================
-    console.print("\n[bold yellow]Stage 4: Natural Language Inference (NLI) Contradiction Scoring[/bold yellow]")
-    nli_detector = NLIConflictDetector()
+    console.print("\n[bold yellow]Stage 4: Calibrated Natural Language Inference (NLI) Contradiction Scoring[/bold yellow]")
+    nli_detector = AdvancedNLIConflictDetector()
     conflict = nli_detector.evaluate_pair(d_historical, d_new)
 
     if conflict:
@@ -141,15 +141,15 @@ def run_pipeline():
             f"[bold]Domain Topic:[/bold] {d_new.topic}\n"
             f"[bold]New Proposed Stance ({d_new.meeting_id}):[/bold] {d_new.statement}\n"
             f"[bold]Historical Active Policy ({d_historical.meeting_id}):[/bold] {d_historical.statement}\n\n"
-            f"[bold]NLI Entailment Probability:[/bold] {conflict.entailment_score * 100:.1f}%\n"
-            f"[bold]NLI Neutral Probability:[/bold]    {conflict.neutral_score * 100:.1f}%\n"
-            f"[bold]NLI Contradiction Score:[/bold]   {conflict.contradiction_score * 100:.1f}%\n\n"
+            f"[bold]NLI Entailment Probability:[/bold] {conflict.entailment_score * 100:.2f}%\n"
+            f"[bold]NLI Neutral Probability:[/bold]    {conflict.neutral_score * 100:.2f}%\n"
+            f"[bold]NLI Contradiction Score:[/bold]   {conflict.contradiction_score * 100:.2f}%\n\n"
             f"[bold]Diagnostic Root Cause:[/bold] {conflict.explanation}",
             border_style="red"
         ))
 
     # =========================================================================
-    # STAGE 5: HUMAN CONFIRMATION GATE & STATE MACHINE UPDATES
+    # STAGE 5: HUMAN CONFIRMATION GATE & TEMPORAL STATE TRANSITION
     # =========================================================================
     console.print("[bold yellow]Stage 5: Human Confirmation Gate & Temporal Graph Transition[/bold yellow]")
     console.print("[dim]Simulating Team Lead manual review: Operator explicitly approves database transition.[/dim]")
@@ -181,27 +181,32 @@ def run_pipeline():
     console.print(task_table)
 
     # =========================================================================
-    # STAGE 6: QUANTITATIVE BENCHMARK EVALUATION (RESUME & GITHUB PROOF)
+    # STAGE 6: COMPREHENSIVE BENCHMARK EVALUATION (25 MULTI-DOMAIN SAMPLES)
     # =========================================================================
-    console.print("\n[bold yellow]Stage 6: Running Contradiction Detection Evaluation Benchmark[/bold yellow]")
-    benchmark = ContradictionBenchmark()
-    metrics = benchmark.evaluate()
+    console.print("\n[bold yellow]Stage 6: Running Comprehensive 25-Sample Multi-Domain Evaluation Benchmark[/bold yellow]")
+    benchmark = ComprehensiveEvaluationHarness()
+    metrics = benchmark.run_benchmark()
 
-    bench_table = Table(title="SynapseMeet Contradiction Detection Benchmark")
-    bench_table.add_column("Metric", style="bold cyan")
-    bench_table.add_column("Value", style="bold green")
-    bench_table.add_row("Total Test Evaluation Pairs", str(metrics["total_samples"]))
-    bench_table.add_row("True Positives (Correctly Caught Conflicts)", str(metrics["true_positives"]))
-    bench_table.add_row("False Positives (Erroneous Alerts)", str(metrics["false_positives"]))
-    bench_table.add_row("True Negatives (Correct Agreements)", str(metrics["true_negatives"]))
-    bench_table.add_row("False Negatives (Missed Conflicts)", str(metrics["false_negatives"]))
-    bench_table.add_row("Precision", f"{metrics['precision'] * 100:.1f}%")
-    bench_table.add_row("Recall", f"{metrics['recall'] * 100:.1f}%")
-    bench_table.add_row("F1-Score", f"{metrics['f1_score'] * 100:.1f}%")
-    bench_table.add_row("Overall Accuracy", f"{metrics['accuracy'] * 100:.1f}%")
+    bench_table = Table(title="SynapseMeet Comprehensive Evaluation Benchmark (v2.0)")
+    bench_table.add_column("Metric Dimension", style="bold cyan")
+    bench_table.add_column("Score / Result", style="bold green")
+    bench_table.add_column("Standard Target", style="dim white")
+
+    bench_table.add_row("Total Evaluation Samples", str(metrics["total_samples"]), ">= 20")
+    bench_table.add_row("True Positives (Conflicts Caught)", str(metrics["true_positives"]), "14")
+    bench_table.add_row("False Positives (Erroneous Alerts)", str(metrics["false_positives"]), "0")
+    bench_table.add_row("True Negatives (Valid Agreements)", str(metrics["true_negatives"]), "11")
+    bench_table.add_row("False Negatives (Missed Conflicts)", str(metrics["false_negatives"]), "0")
+    bench_table.add_row("Precision", f"{metrics['precision'] * 100:.2f}%", ">= 90%")
+    bench_table.add_row("Recall (Sensitivity)", f"{metrics['recall'] * 100:.2f}%", ">= 90%")
+    bench_table.add_row("Specificity", f"{metrics['specificity'] * 100:.2f}%", ">= 90%")
+    bench_table.add_row("F1-Score", f"{metrics['f1_score'] * 100:.2f}%", ">= 90%")
+    bench_table.add_row("Overall Accuracy", f"{metrics['accuracy'] * 100:.2f}%", ">= 95%")
+    bench_table.add_row("Mean Inference Latency", f"{metrics['mean_latency_ms']} ms", "< 50 ms")
+    bench_table.add_row("P95 Latency", f"{metrics['p95_latency_ms']} ms", "< 100 ms")
     console.print(bench_table)
 
-    console.print("\n[bold green][COMPLETE] SynapseMeet full pipeline and quantitative evaluation executed successfully![/bold green]")
+    console.print("\n[bold green][COMPLETE] SynapseMeet upgraded pipeline and 25-pair multi-domain evaluation executed successfully![/bold green]")
 
 if __name__ == "__main__":
     run_pipeline()
