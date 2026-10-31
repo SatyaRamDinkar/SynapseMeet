@@ -1,6 +1,6 @@
-<div align="center">
+﻿<div align="center">
 
-# ⚡ SynapseMeet: Autonomous Meeting-to-Execution Agent
+# âš¡ SynapseMeet: Autonomous Meeting-to-Execution Agent
 ### *Autonomous Cross-Meeting Memory, NLI Contradiction Engine, and Guarded Execution*
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
@@ -12,8 +12,8 @@
 
 ---
 
-## 🎯 Executive Summary
-Most AI meeting tools are merely **transcript summarizers** — they compress audio into text, but decisions remain lost in docs, and commitments easily slip. Crucially, they lack **cross-meeting memory**: they cannot detect when a decision agreed upon today directly contradicts a policy, architecture, or deadline approved two weeks ago.
+## ðŸŽ¯ Executive Summary
+Most AI meeting tools are merely **transcript summarizers** â€” they compress audio into text, but decisions remain lost in docs, and commitments easily slip. Crucially, they lack **cross-meeting memory**: they cannot detect when a decision agreed upon today directly contradicts a policy, architecture, or deadline approved two weeks ago.
 
 **SynapseMeet** is an agentic, production-grade intelligence layer that:
 1. **Ingests multi-speaker conversations** with speaker attribution & timestamps.
@@ -25,7 +25,7 @@ Most AI meeting tools are merely **transcript summarizers** — they compress au
 
 ---
 
-## 🏗️ System Architecture
+## ðŸ—ï¸ System Architecture
 
 ```mermaid
 flowchart TD
@@ -52,7 +52,7 @@ flowchart TD
 
 ---
 
-## 🔬 AI/ML Innovations
+## ðŸ”¬ AI/ML Innovations
 
 ### 1. Cross-Meeting Contradiction Detection (NLI)
 When an extracted decision $D_{new}$ is proposed, the system performs Graph RAG to retrieve historical decisions $D_{hist}$ related to the topic. A Cross-Encoder NLI model computes:
@@ -67,7 +67,7 @@ Nodes and edges carry valid-time timestamps `[valid_from, valid_to]`.
 
 ---
 
-## 🚀 Quickstart
+## ðŸš€ Quickstart
 
 ### Prerequisites
 - Python 3.10+
@@ -99,44 +99,30 @@ python -m src.main
 
 ---
 
-## 📁 Repository Structure
+## ðŸ“ Repository Structure
 
 ```
 SynapseMeet/
-├── data/
-│   └── sample_transcripts/    # Multi-speaker sample meetings with conflicting decisions
-├── research_papers/           # Foundational literature & benchmark datasets
-│   ├── MemConflict (2026)     # Evaluating Long-Term Memory Systems Under Memory Conflicts
-│   ├── MeMo (2024)            # Multimodal Dataset for Memory Modelling in Multiparty Conversations
-│   ├── Meetalk                # Retrieval-Augmented & Adaptively Personalized Meeting Summarization
-│   └── Action Item Detection  # Context Modeling for Multiparty Dialogue
-├── src/
-│   ├── ingestion/             # Audio processing & speaker diarization
-│   ├── schemas/               # Pydantic data models for decisions, tasks & alerts
-│   ├── memory/                # Temporal Knowledge Graph (NetworkX / Graph RAG)
-│   ├── reasoning/             # NLI Contradiction and Conflict Detection Engine
-│   ├── execution/             # Human-in-the-loop confirmation & tracker connectors
-│   ├── cron/                  # Reminder agent & weekly digest generator
-│   └── main.py                # Pipeline entrypoint and orchestration
-├── HACKATHON_PROJECT_PROPOSAL.md  # Complete problem statement & evaluation breakdown
-├── sync-git.ps1               # Automated git push script for prompt iterations
-├── requirements.txt           # Python dependencies
-└── README.md                  # Project overview and documentation
+â”œâ”€â”€ data/
+â”‚   â””â”€â”€ sample_transcripts/    # Multi-speaker sample meetings with conflicting decisions
+â”œâ”€â”€ src/
+â”‚   â”œâ”€â”€ ingestion/             # Audio processing & speaker diarization
+â”‚   â”œâ”€â”€ schemas/               # Pydantic data models for decisions, tasks & alerts
+â”‚   â”œâ”€â”€ memory/                # Temporal Knowledge Graph (NetworkX / Graph RAG)
+â”‚   â”œâ”€â”€ reasoning/             # NLI Contradiction and Conflict Detection Engine
+â”‚   â”œâ”€â”€ execution/             # Human-in-the-loop confirmation & tracker connectors
+â”‚   â”œâ”€â”€ cron/                  # Reminder agent & weekly digest generator
+â”‚   â””â”€â”€ main.py                # Pipeline entrypoint and orchestration
+â”œâ”€â”€ HACKATHON_PROJECT_PROPOSAL.md  # Complete problem statement & evaluation breakdown
+â”œâ”€â”€ sync-git.ps1               # Automated git push script for prompt iterations
+â”œâ”€â”€ requirements.txt           # Python dependencies
+â””â”€â”€ README.md                  # Project overview and documentation
 ```
 
 ---
 
-## 📚 Foundational Research & Academic Citations
-SynapseMeet's architecture is grounded in cutting-edge conversational AI and memory conflict research:
-- **Memory Conflict Evaluation**: Tao et al. (2026) - *MemConflict: Evaluating Long-Term Memory Systems Under Memory Conflicts*.
-- **Multimodal Multiparty Memory**: Tsfasman et al. (2024) - *MeMo: A Multimodal Dataset for Memory Modelling in Multiparty Conversations*.
-- **Personalized Meeting RAG**: Chen et al. - *Meetalk: Retrieval-Augmented and Adaptively Personalized Meeting Summarization with Knowledge Learning from User Context*.
-- **Action Item Extraction**: Liu et al. (2023) - *Meeting Action Item Detection with Regularized Context Modeling*.
-- **Meeting Insight Extraction**: Bhuvaji et al. (2025) - *A Retrieval-Augmented Framework For Meeting Insight Extraction*.
-
----
-
-## 👨‍💻 Author
+## ðŸ‘¨â€ðŸ’» Author
 **Satya Ram Dinkar**
 - GitHub: [@SatyaRamDinkar](https://github.com/SatyaRamDinkar)
 - Role: AI/ML Engineer
+
