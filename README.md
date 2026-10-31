@@ -2,6 +2,7 @@
 ## Autonomous Meeting-to-Execution Agent with Cross-Meeting Memory & Conflict Detection
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python&logoColor=white)
+![UI](https://img.shields.io/badge/UI-Streamlit_Enhanced-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)
 ![AI Framework](https://img.shields.io/badge/Orchestrator-LangGraph-purple?style=for-the-badge)
 ![Memory](https://img.shields.io/badge/Memory-Temporal_Knowledge_Graph-emerald?style=for-the-badge)
 ![NLI](https://img.shields.io/badge/Reasoning-Calibrated_NLI_Engine-orange?style=for-the-badge)
@@ -26,6 +27,7 @@ This project builds upon and directly extends the foundational research paper:
 
 | Feature / Domain | Base Paper Approach (Bhuvaji et al., SAC 2025) | SynapseMeet Innovation |
 | :--- | :--- | :--- |
+| **User Interface** | CLI / Offline Evaluation Script | **Interactive Streamlit Web Dashboard** with real-time conflict triage cards |
 | **Meeting Organization** | Summary-level hierarchical clustering over historical transcripts | **Clustered Temporal Knowledge Graph** combining clustering with time-validity windows `[valid_from, valid_to]` |
 | **Retrieval Architecture** | Flat chunk retrieval over vector stores | **Hybrid Dense-Sparse RAG (BM25 + Dense Cosine)** fused via Reciprocal Rank Fusion (RRF) |
 | **Analytical Scope** | Passive retrospective Q&A and post-meeting summarization | **Proactive Cross-Meeting Contradiction Detection** using Calibrated Cross-Encoder NLI ($P(\text{Contradiction})$) |
@@ -133,26 +135,38 @@ SynapseMeet includes a multi-domain quantitative evaluation benchmark tested acr
 
 ---
 
-## Core Capabilities
+## How to Run & Deploy Locally
 
-### 1. Speaker-Attributed Structured Ingestion
-Multi-speaker transcripts are segmented with speaker attribution, millisecond timestamps, and confidence metrics, mapping spoken dialogue directly to individual participants.
+### Option 1: Streamlit Interactive Web App (Recommended)
+Launch the Streamlit web dashboard:
+```bash
+streamlit run app.py
+```
+*(Or double-click `start_app.bat` on Windows)*
 
-### 2. Agglomerative Meeting Clustering (ACM SAC 2025)
-Historical meetings are clustered into technical domains using summary-level TF-IDF and agglomerative cosine linkage, restricting cross-meeting reasoning to relevant organizational domains.
+The dashboard will open automatically in your browser at:
+`http://localhost:8501`
 
-### 3. Cross-Meeting Temporal Knowledge Graph
-Instead of flat vector stores that suffer from temporal blindness, SynapseMeet models organizational memory as an evolving directed graph:
-* `(Person:Alice) -[:COMMITTED_TO]-> (Task:T1) -[:DUE_AT]-> (Date:2026-11-15)`
-* `(Decision:D2) -[:SUPERSEDES]-> (Decision:D1)`
+### Option 2: Headless Python CLI Pipeline
+To run the automated pipeline and multi-domain evaluation benchmark in terminal:
+```bash
+python -m src.main
+```
 
-### 4. Calibrated Natural Language Inference (NLI) Contradiction Engine
-When an extracted decision is proposed, the system queries the temporal knowledge graph for related historical policies. A cross-encoder model computes:
-$$\text{Softmax}(P(\text{Entailment}), P(\text{Neutral}), P(\text{Contradiction}))$$
-If the contradiction probability exceeds the threshold ($>0.65$), the system halts automatic posting and surfaces an actionable conflict report with root-cause entity attribution.
+---
 
-### 5. Guarded Execution Gate & State Machine
-No action item or task is posted to issue trackers without human confirmation. Once approved, the system automatically transitions the predecessor decision state to `SUPERSEDED` and commits the new task to Linear, Jira, or GitHub Issues.
+## How to Deploy to Streamlit Community Cloud (Free 1-Click Deployment)
+
+Just like your project **ResQ-MAR**, SynapseMeet can be deployed in under 2 minutes for free:
+
+1. Open **[share.streamlit.io](https://share.streamlit.io)** and log in with your GitHub account (`SatyaRamDinkar`).
+2. Click **"New app"**.
+3. Select your repository: **`SatyaRamDinkar/SynapseMeet`**.
+4. Set **Branch**: `main`.
+5. Set **Main file path**: `app.py`.
+6. Click **"Deploy!"**.
+
+Streamlit Cloud will read `requirements.txt` and launch your live public URL (e.g. `https://synapsemeet.streamlit.app`).
 
 ---
 
@@ -160,6 +174,8 @@ No action item or task is posted to issue trackers without human confirmation. O
 
 ```
 SynapseMeet/
+|-- app.py                         # Streamlit interactive web dashboard
+|-- start_app.bat                  # One-click Windows application launcher
 |-- data/
 |   `-- sample_transcripts/        # Multi-speaker sample meetings with policy conflicts
 |-- docs/
@@ -184,50 +200,11 @@ SynapseMeet/
 |   |-- evaluation/                # Contradiction detection evaluation benchmarks
 |   |   |-- contradiction_benchmark.py
 |   |   `-- comprehensive_benchmark.py
-|   `-- main.py                    # Pipeline entrypoint and end-to-end demonstration
+|   `-- main.py                    # CLI pipeline entrypoint and end-to-end demonstration
 |-- HACKATHON_PROJECT_PROPOSAL.md  # Complete problem statement and evaluation rubric
 |-- sync-git.ps1                   # Automated git push script for prompt iterations
 |-- requirements.txt               # Python dependencies
 `-- README.md                      # Project overview and documentation
-```
-
----
-
-## Getting Started
-
-### Prerequisites
-* Python 3.10 or higher
-* Git
-
-### Installation
-
-1. Clone the repository:
-```bash
-git clone https://github.com/SatyaRamDinkar/SynapseMeet.git
-cd SynapseMeet
-```
-
-2. Create and activate a virtual environment:
-```bash
-# Windows
-python -m venv venv
-.\venv\Scripts\activate
-
-# Linux / macOS
-python3 -m venv venv
-source venv/bin/activate
-```
-
-3. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-### Running the Demonstration
-
-To run the full end-to-end multi-meeting clustering, conflict detection, state machine, and benchmark pipeline:
-```bash
-python -m src.main
 ```
 
 ---
