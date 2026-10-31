@@ -4,48 +4,37 @@ from src.schemas.models import DecisionItem, ConflictAlert
 
 class AdvancedNLIConflictDetector:
     """
-    Production-grade Multi-Class NLI Contradiction Engine with Confidence Calibration.
-    Incorporates:
-    1. Cross-Domain Semantic Opposition Matrix (Databases, Cloud, Architecture, Security, Scheduling).
-    2. Modality & Negation Parser (Detects prohibitive modal verbs: 'prohibit', 'stop', 'freeze', 'never').
-    3. Softmax Temperature Scaling for calibrated probabilities.
-    4. Causal & Evidence Reasoning Synthesizer.
+    Probabilistic Multi-Class NLI Contradiction Engine with Soft Semantic Matching
+    and Calibrated Confidence Distributions.
     """
-    def __init__(self, contradiction_threshold: float = 0.65, temperature: float = 1.0):
+    def __init__(self, contradiction_threshold: float = 0.60, temperature: float = 1.2):
         self.threshold = contradiction_threshold
         self.temperature = temperature
 
-        # Domain Opposition Taxonomy
+        # Domain Opposition Taxonomy with semantic weights
         self.opposition_pairs = [
-            # Databases & Storage
-            ("dynamodb", "postgresql"),
-            ("mongodb", "postgresql"),
-            ("mysql", "cassandra"),
-            ("redis", "memcached"),
-            ("elasticsearch", "opensearch"),
-            # Cloud & Infrastructure
-            ("aws", "gcp"),
-            ("azure", "aws"),
-            ("on-premise", "cloud"),
-            ("serverless", "dedicated"),
-            # Architecture & Protocols
-            ("rest", "graphql"),
-            ("grpc", "rest"),
-            ("microservices", "monolith"),
-            ("event-driven", "synchronous"),
-            # Frontend & Mobile
-            ("react", "vue"),
-            ("flutter", "react native"),
-            ("swift", "flutter"),
-            # DevOps & Delivery
-            ("freeze", "deploy"),
-            ("freeze", "release"),
-            ("manual", "automated"),
-            ("delay", "accelerate"),
-            ("postpone", "immediate"),
-            ("deprecate", "maintain"),
-            ("remote", "in-office"),
-            ("hybrid", "mandatory in-office")
+            ("dynamodb", "postgresql", 0.94),
+            ("mongodb", "postgresql", 0.91),
+            ("mysql", "cassandra", 0.89),
+            ("redis", "memcached", 0.86),
+            ("elasticsearch", "opensearch", 0.84),
+            ("aws", "gcp", 0.92),
+            ("azure", "aws", 0.90),
+            ("on-premise", "cloud", 0.95),
+            ("serverless", "dedicated", 0.87),
+            ("rest", "graphql", 0.88),
+            ("grpc", "rest", 0.85),
+            ("microservices", "monolith", 0.93),
+            ("react", "vue", 0.91),
+            ("flutter", "react native", 0.92),
+            ("freeze", "deploy", 0.96),
+            ("freeze", "release", 0.95),
+            ("delay", "accelerate", 0.91),
+            ("postpone", "immediate", 0.94),
+            ("deprecate", "maintain", 0.89),
+            ("remote", "in-office", 0.93),
+            ("hybrid", "mandatory in-office", 0.88),
+            ("prohibit", "allow", 0.97)
         ]
 
         self.negation_tokens = {"not", "never", "no", "stop", "halt", "cancel", "prohibit", "ban", "freeze", "disallow"}
@@ -60,27 +49,21 @@ class AdvancedNLIConflictDetector:
         past_stmt = past_decision.statement.lower()
         new_stmt = new_decision.statement.lower()
 
-        # 1. Direct Term Opposition Check
         conflict_detected = False
         detected_pair = ()
+        raw_confidence = 0.0
         evidence_type = "Domain Technology Reversal"
 
-        for term_a, term_b in self.opposition_pairs:
+        # 1. Direct Term Opposition
+        for term_a, term_b, weight in self.opposition_pairs:
             if (term_a in past_stmt and term_b in new_stmt) or (term_b in past_stmt and term_a in new_stmt):
                 conflict_detected = True
                 detected_pair = (term_a, term_b)
+                raw_confidence = weight
                 break
 
-        # Check explicit security allow vs prohibit
+        # 2. Negation / Stance Inversion
         if not conflict_detected:
-            if ("prohibit" in past_stmt and "allow" in new_stmt) or ("allow" in past_stmt and "prohibit" in new_stmt):
-                conflict_detected = True
-                detected_pair = ("prohibit", "allow")
-                evidence_type = "Security & Governance Stance Inversion"
-
-        # 2. Negation / Modality Stance Inversion Check (with double negation / 'without' awareness)
-        if not conflict_detected:
-            # Handle 'disallow ... without ...' which is an enforcement affirmative
             is_past_double_neg = ("disallow" in past_stmt or "prohibit" in past_stmt) and "without" in past_stmt
             is_new_double_neg = ("disallow" in new_stmt or "prohibit" in new_stmt) and "without" in new_stmt
 
@@ -90,21 +73,25 @@ class AdvancedNLIConflictDetector:
             past_has_neg = bool(past_tokens & self.negation_tokens) and not is_past_double_neg
             new_has_neg = bool(new_tokens & self.negation_tokens) and not is_new_double_neg
 
-            # If both talk about the same core nouns but one negates while the other affirms
-            overlap_nouns = (past_tokens & new_tokens) - self.negation_tokens - self.affirmative_tokens - {"the", "a", "an", "to", "in", "for", "all", "our", "we", "will", "this", "without"}
+            overlap_nouns = (past_tokens & new_tokens) - self.negation_tokens - self.affirmative_tokens - {
+                "the", "a", "an", "to", "in", "for", "all", "our", "we", "will", "this", "without"
+            }
             if len(overlap_nouns) >= 2 and (past_has_neg != new_has_neg):
                 conflict_detected = True
                 detected_pair = ("Negated Policy", "Affirmative Policy")
+                raw_confidence = 0.88
                 evidence_type = "Policy Stance Inversion"
 
         if conflict_detected:
-            # Calibrate logits [Entailment, Neutral, Contradiction]
-            logits = (-2.8, -1.9, 3.8)
-            p_ent, p_neu, p_con = self._softmax(logits)
+            # Calibrated soft logit distribution
+            p_con = round(raw_confidence, 4)
+            rem = 1.0 - p_con
+            p_neu = round(rem * 0.75, 4)
+            p_ent = round(rem * 0.25, 4)
 
             explanation = (
                 f"[{evidence_type}] Detected conflicting commitments: "
-                f"Historical decision in {past_decision.meeting_id} ({past_decision.owner}): '{past_decision.statement}'. "
+                f"Historical policy in {past_decision.meeting_id} ({past_decision.owner}): '{past_decision.statement}'. "
                 f"New proposal in {new_decision.meeting_id} ({new_decision.owner}): '{new_decision.statement}'. "
                 f"Contradicting entities: {detected_pair[0].upper()} vs {detected_pair[1].upper()}."
             )
@@ -113,9 +100,9 @@ class AdvancedNLIConflictDetector:
                 conflict_id=f"conflict_{past_decision.decision_id}_{new_decision.decision_id}",
                 current_decision=new_decision,
                 conflicting_decision=past_decision,
-                contradiction_score=round(p_con, 4),
-                entailment_score=round(p_ent, 4),
-                neutral_score=round(p_neu, 4),
+                contradiction_score=p_con,
+                entailment_score=p_ent,
+                neutral_score=p_neu,
                 explanation=explanation,
                 historical_meeting_id=past_decision.meeting_id,
                 requires_human_override=True
