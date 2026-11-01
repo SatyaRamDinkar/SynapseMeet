@@ -82,10 +82,20 @@ This document contains the exact word-for-word spoken script, click sequences, s
 
 ---
 
-## 🔗 Adding Your Demo Video Link to GitHub
+## Submitted Demo Video
+
+**Status**: Recorded and submitted.
+
+**Google Drive Link**: [https://drive.google.com/file/d/1JjstTAXigE10PmEkdF1mZjA0haU3aiPk/view?usp=drive_link](https://drive.google.com/file/d/1JjstTAXigE10PmEkdF1mZjA0haU3aiPk/view?usp=drive_link)
+
+This link is also embedded in the project README.md as a prominent badge at the top of the repository.
+
+---
+
+## Recording Guide (Reference)
 
 Once you finish recording:
 1. Upload your video file (`.mp4`) to Google Drive.
-2. Share $\rightarrow$ Set to **"Anyone with the link can view"** $\rightarrow$ Copy link.
+2. Share → Set to **"Anyone with the link can view"** → Copy link.
 3. Paste the Google Drive link into our chat.
 4. I will immediately add a prominent **Watch Demo Video** badge and section to your GitHub README and commit/push it for you!

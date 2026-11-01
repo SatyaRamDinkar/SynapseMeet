@@ -1,6 +1,10 @@
 # SynapseMeet
 ## Autonomous Meeting-to-Execution Agent with Cross-Meeting Memory & Conflict Detection
 
+[![Watch Demo Video](https://img.shields.io/badge/Watch%20Demo%20Video-Google%20Drive-red?style=for-the-badge&logo=google-drive&logoColor=white)](https://drive.google.com/file/d/1JjstTAXigE10PmEkdF1mZjA0haU3aiPk/view?usp=drive_link)
+[![Live App](https://img.shields.io/badge/Live%20App-Streamlit%20Cloud-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://synapsemeet-xeifapaaw5ozmagtkpyj9j.streamlit.app/)
+[![GitHub Repo](https://img.shields.io/badge/GitHub-SatyaRamDinkar%2FSynapseMeet-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/SatyaRamDinkar/SynapseMeet)
+
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python&logoColor=white)
 ![UI](https://img.shields.io/badge/UI-Streamlit_Enhanced-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)
 ![AI Framework](https://img.shields.io/badge/Orchestrator-LangGraph-purple?style=for-the-badge)
@@ -10,6 +14,18 @@
 ![Status](https://img.shields.io/badge/Status-Hackathon_Prototype-success?style=for-the-badge)
 
 SynapseMeet is an autonomous meeting intelligence and execution agent designed for engineering and product organizations. It ingests multi-speaker conversations, extracts verifiable decisions and action items, organizes organizational memory across historical meetings using an Agglomerative Clustered Temporal Knowledge Graph, and detects policy or deadline contradictions using Calibrated Natural Language Inference (NLI) before dispatching tasks to external trackers (Linear, Jira, GitHub Issues).
+
+---
+
+## Demo Video
+
+> **[Watch the 2-3 Minute Hackathon Demo on Google Drive](https://drive.google.com/file/d/1JjstTAXigE10PmEkdF1mZjA0haU3aiPk/view?usp=drive_link)**
+
+The demo video covers:
+- Live contradiction detection: cross-meeting NLI conflict flagging in real time
+- Temporal Knowledge Graph state machine: ACTIVE to SUPERSEDED decision lifecycle transitions
+- Human-in-the-loop confirmation gate before tracker dispatch
+- Quantitative benchmark comparison against the ACM SAC 2025 base paper (Bhuvaji et al.)
 
 ---
 

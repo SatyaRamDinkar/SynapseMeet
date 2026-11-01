@@ -44,6 +44,12 @@ data/raw/
 # Research PDFs (large binary files - stored locally only)
 *.pdf
 
+# Video files (too large for GitHub - shared via Google Drive)
+*.mp4
+*.mov
+*.avi
+*.mkv
+
 # IDE & OS
 .vscode/
 .idea/
